@@ -3,197 +3,288 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>商品線上訂購</title>
+  <title>商品線上訂購單</title>
+  <!-- 引入 LIFF SDK -->
   <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 20px; background: #f5f5f7; }
-    .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-width: 400px; margin: 0 auto; }
-    h2 { margin-top: 0; color: #333; text-align: center; }
-    .user-info { margin-bottom: 15px; padding: 10px; background: #eef6ff; border-radius: 8px; font-size: 14px; color: #1a73e8; text-align: center; }
-    .form-group { margin-bottom: 15px; }
-    label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
-    .product-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
-    .product-item:last-child { border-bottom: none; }
-    .product-name { font-size: 16px; }
-    .product-price { color: #888; font-size: 14px; }
-    .qty-input { width: 60px; padding: 5px; text-align: center; border: 1px solid #ccc; border-radius: 6px; }
-    .total-box { background: #fff8f8; padding: 15px; border-radius: 8px; text-align: right; font-weight: bold; font-size: 18px; margin-bottom: 15px; color: #333; }
-    #totalAmount { color: #e93524; font-size: 22px; margin: 0 5px; }
-    button { width: 100%; padding: 12px; background: #06C755; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; }
-    button:disabled { background: #ccc; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #f7f9fa;
+      margin: 0;
+      padding: 16px;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+      margin-top: 0;
+    }
+    /* 公告說明區塊 */
+    .notice-box {
+      background: #fff3cd;
+      border: 1px solid #ffeeba;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      color: #856404;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .product-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .product-info h3 {
+      margin: 0 0 4px 0;
+      font-size: 16px;
+    }
+    .product-price {
+      margin: 0;
+      color: #e74c3c;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .product-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+    }
+    .quantity-control {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .quantity-control button {
+      width: 32px;
+      height: 32px;
+      border: 1px solid #ccc;
+      background: #fff;
+      border-radius: 50%;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .quantity-control button:active {
+      background: #eee;
+    }
+    .quantity-control span {
+      font-size: 16px;
+      font-weight: bold;
+      min-width: 24px;
+      text-align: center;
+    }
+    /* 結算區塊 */
+    .checkout-summary {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+    .summary-row.total {
+      font-size: 18px;
+      font-weight: bold;
+      color: #d9534f;
+      border-top: 1px dashed #ddd;
+      padding-top: 8px;
+      margin-top: 8px;
+    }
+    .submit-btn {
+      width: 100%;
+      background: #06c755;
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    .submit-btn:active {
+      background: #05b34c;
+    }
   </style>
 </head>
 <body>
 
-<div class="card">
+<div class="container">
   <h2>專屬訂購單</h2>
-  <div class="user-info" id="userDisplay">正在驗證 LINE 身分...</div>
-  
-  <!-- 💡 在這裡加入你想說明的文字區塊 -->
-  <div class="notice-box" style="background: #fff3cd; padding: 12px; border-radius: 8px; margin-bottom: 15px; color: #856404; font-size: 14px;">
+
+  <!-- 公告說明區塊 -->
+  <div class="notice-box">
     <strong>📢 訂購須知：</strong><br>
     本次訂購為12月取貨。先統計數量，在看怎麼安排取貨時間。<br>
     前方有"🎉"為本次新品，有興趣者歡迎選購！
   </div>
-  
-  <form id="orderForm">    
-    <div class="form-group">
-      <label>訂購品項 (請填寫數量)</label>
-      
-      <!-- 16個品項 -->
-      <div class="product-item"><div><div class="product-name">紅豆</div><div class="product-price">$48 / 顆</div></div><input type="number" id="qty1" class="qty-input" data-price="48" min="0" value="0"></div>
-      <div class="product-item"><div><div class="product-name">芋泥</div><div class="product-price">$48 / 顆</div></div><input type="number" id="qty2" class="qty-input" data-price="48" min="0" value="0"></div>
-      <div class="product-item"><div><div class="product-name">乳酪丁</div><div class="product-price">$48 / 顆</div></div><input type="number" id="qty3" class="qty-input" data-price="48" min="0" value="0"></div>
-      <div class="product-item"><div><div class="product-name">花生</div><div class="product-price">$48 / 顆</div></div><input type="number" id="qty4" class="qty-input" data-price="48" min="0" value="0"></div>
-      <div class="product-item"><div><div class="product-name">巧克力</div><div class="product-price">$48 / 顆</div></div><input type="number" id="qty5" class="qty-input" data-price="48" min="0" value="0"></div>
-      <div class="product-item"><div><div class="product-name">奶酥</div><div class="product-price">$53 / 顆</div></div><input type="number" id="qty6" class="qty-input" data-price="53" min="0" value="0"></div>
-      <div class="product-item"><div><div class="product-name">黑芝麻</div><div class="product-price">$51 / 顆</div></div><input type="number" id="qty7" class="qty-input" data-price="51" min="0" value="0"></div>
-      <div class="product-item"><div><div class="product-name">綠豆</div><div class="product-price">$51 / 顆</div></div><input type="number" id="qty8" class="qty-input" data-price="51" min="0" value="0"></div>
-      <div class="product-item"><div><div class="product-name">肉鬆</div><div class="product-price">$51 / 顆</div></div><input type="number" id="qty9" class="qty-input" data-price="51" min="0" value="0"></div>
-      <div class="product-item"><div><div class="product-name">鹹蛋芋頭</div><div class="product-price">$58 / 顆</div></div><input type="number" id="qty10" class="qty-input" data-price="58" min="0" value="0"></div>
-      <div class="product-item"><div><div class="product-name">蔓越莓乳酪丁</div><div class="product-price">$58 / 顆</div></div><input type="number" id="qty11" class="qty-input" data-price="58" min="0" value="0"></div>
-      <div class="product-item"><div><div class="product-name">草莓奶酥</div><div class="product-price">$58 / 顆</div></div><input type="number" id="qty12" class="qty-input" data-price="58" min="0" value="0"></div>
-      <div class="product-item"><div><div class="product-name">起司奶酥</div><div class="product-price">$58 / 顆</div></div><input type="number" id="qty13" class="qty-input" data-price="58" min="0" value="0"></div>
-      <div class="product-item"><div><div class="product-name">🎉抹茶奶酥芋泥</div><div class="product-price">$58 / 顆</div></div><input type="number" id="qty14" class="qty-input" data-price="58" min="0" value="0"></div>
-      <div class="product-item"><div><div class="product-name">🎉黑糖肉桂奶酥</div><div class="product-price">$58 / 顆</div></div><input type="number" id="qty15" class="qty-input" data-price="58" min="0" value="0"></div>
-      <div class="product-item"><div><div class="product-name">🎉黑糖麻吉</div><div class="product-price">$53 / 顆</div></div><input type="number" id="qty16" class="qty-input" data-price="53" min="0" value="0"></div>
-    </div>
 
-    <!-- 總計金額 -->
-    <div class="total-box">
-      總計：<span id="totalAmount">0</span> 元
-    </div>
+  <!-- 品項列表容器 -->
+  <div id="product-list"></div>
 
-    <!-- 結算資訊區塊 -->
-    <div class="checkout-summary" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
-  
-    <!-- 💡 新增：總數量顯示位置 -->
-    <div class="summary-item" style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 16px;">
-     <span>總數量：</span>
-     <span id="total-qty" style="font-weight: bold; color: #333;">0</span> 件
+  <!-- 結算資訊區塊 -->
+  <div class="checkout-summary">
+    <div class="summary-row">
+      <span>總數量：</span>
+      <span><strong id="total-qty">0</strong> 件</span>
     </div>
+    <div class="summary-row total">
+      <span>總金額：</span>
+      <span id="total-amount">$0</span>
+    </div>
+  </div>
 
-    <!-- 原有的總金額顯示位置 -->
-    <div class="summary-item" style="display: flex; justify-content: space-between; font-size: 18px;">
-     <span>總金額：</span>
-     <span id="total-amount" style="font-weight: bold; color: #d9534f;">$0</span>
-    </div>
-   </div>
-    
-    <button type="submit" id="submitBtn" disabled>確認提交訂單</button>
-  </form>
+  <button class="submit-btn" onclick="submitOrder()">確認送出訂單</button>
 </div>
 
 <script>
-  const MY_LIFF_ID = "2012419596-l7jcyOIj"; // 填入你的 LIFF ID
-  const GAS_URL = "https://script.google.com/macros/s/AKfycbxZflNqYLbreKzYventNg6gEjx7HNY8jlthE0S5rtame8XhnDsv15MFUWeGhK6wtjHGLw/exec"; // 填入你的 GAS 網址
+  // 16 個品項資料（名稱與價格可在此自由修改）
+  const products = [
+    { id: 1, name: "紅豆", price: 48, quantity: 0 },
+    { id: 2, name: "芋泥", price: 48, quantity: 0 },
+    { id: 3, name: "乳酪丁", price: 48, quantity: 0 },
+    { id: 4, name: "花生", price: 48, quantity: 0 },
+    { id: 5, name: "巧克力", price: 48, quantity: 0 },
+    { id: 6, name: "奶酥", price: 53, quantity: 0 },
+    { id: 7, name: "黑芝麻", price: 51, quantity: 0 },
+    { id: 8, name: "綠豆", price: 51, quantity: 0 },
+    { id: 9, name: "肉鬆", price: 51, quantity: 0 },
+    { id: 10, name: "鹹蛋芋頭", price: 58, quantity: 0 },
+    { id: 11, name: "蔓越莓乳酪丁", price: 58, quantity: 0 },
+    { id: 12, name: "草莓奶酥", price: 58, quantity: 0 },
+    { id: 13, name: "起司奶酥", price: 58, quantity: 0 },
+    { id: 14, name: "🎉抹茶奶酥芋泥", price: 58, quantity: 0 },
+    { id: 15, name: "🎉黑糖肉桂奶酥", price: 58, quantity: 0 },
+    { id: 16, name: "🎉黑糖麻吉", price: 53, quantity: 0 }
+  ];
 
-  let currentUser = { userId: "", displayName: "" };
-  let finalTotal = 0;
+  let lineProfile = { userId: "TEST_USER", displayName: "測試用戶" };
 
-  const qtyInputs = document.querySelectorAll('.qty-input');
-  const totalDisplay = document.getElementById('totalAmount');
+  // 初始化網頁與 LIFF
+  window.onload = function() {
+    renderProducts();
+    // 填入你的 LIFF ID (例如 200xxxxxxx-xxxxxxx)
+    initializeLiff("2012419596-l7jcyOIj"); 
+  };
 
-  function calculateTotal() {
-    finalTotal = 0;
-    qtyInputs.forEach(input => {
-      const qty = parseInt(input.value) || 0;
-      const price = parseInt(input.getAttribute('data-price')) || 0;
-      finalTotal += (qty * price);
-    });
-    totalDisplay.innerText = finalTotal;
+  function initializeLiff(liffId) {
+    liff.init({ liffId: liffId })
+      .then(() => {
+        if (!liff.isLoggedIn()) {
+          liff.login();
+        } else {
+          liff.getProfile().then(profile => {
+            lineProfile.userId = profile.userId;
+            lineProfile.displayName = profile.displayName;
+          }).catch(err => console.error("取得 Profile 失敗", err));
+        }
+      })
+      .catch(err => console.error("LIFF 初始化失敗", err));
   }
 
-  qtyInputs.forEach(input => {
-    input.addEventListener('input', calculateTotal);
-  });
+  // 渲染商品列表（包含價格與數量控制）
+  function renderProducts() {
+    const listContainer = document.getElementById("product-list");
+    listContainer.innerHTML = "";
 
-  async function main() {
-    try {
-      await liff.init({ liffId: MY_LIFF_ID });
-      if (!liff.isLoggedIn()) {
-        liff.login();
-        return;
-      }
-      
-      const profile = await liff.getProfile();
-      currentUser.userId = profile.userId;
-      currentUser.displayName = profile.displayName;
-      
-      document.getElementById("userDisplay").innerText = `訂購帳號：${profile.displayName}`;
-      document.getElementById("submitBtn").disabled = false;
-    } catch (err) {
-      document.getElementById("userDisplay").innerText = "LINE 驗證失敗，請重新整理或在 LINE 內開啟";
+    products.forEach((product, index) => {
+      const card = document.createElement("div");
+      card.className = "product-card";
+      card.innerHTML = `
+        <div class="product-info">
+          <h3>${product.name}</h3>
+        </div>
+        <div class="product-right">
+          <p class="product-price">$${product.price}</p>
+          <div class="quantity-control">
+            <button onclick="changeQty(${index}, -1)">-</button>
+            <span id="qty-${index}">${product.quantity}</span>
+            <button onclick="changeQty(${index}, 1)">+</button>
+          </div>
+        </div>
+      `;
+      listContainer.appendChild(card);
+    });
+  }
+
+  // 增減數量
+  function changeQty(index, delta) {
+    products[index].quantity += delta;
+    if (products[index].quantity < 0) {
+      products[index].quantity = 0;
     }
+    document.getElementById(`qty-${index}`).innerText = products[index].quantity;
+    updateSummary();
   }
 
-  document.getElementById("orderForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    
+  // 即時計算總數量與總金額
+  function updateSummary() {
     let totalQty = 0;
-    qtyInputs.forEach(input => {
-      totalQty += parseInt(input.value) || 0;
+    let totalAmount = 0;
+
+    products.forEach(p => {
+      totalQty += p.quantity;
+      totalAmount += p.quantity * p.price;
     });
 
+    document.getElementById("total-qty").innerText = totalQty;
+    document.getElementById("total-amount").innerText = `$${totalAmount}`;
+  }
+
+  // 送出訂單至 Google Apps Script
+  function submitOrder() {
+    const totalQty = products.reduce((sum, p) => sum + p.quantity, 0);
     if (totalQty === 0) {
-      alert("請至少選擇一項商品數量！");
+      alert("請至少選擇一個商品再送出訂單！");
       return;
     }
 
-    const btn = document.getElementById("submitBtn");
-    btn.disabled = true;
-    btn.innerText = "訂單傳送中...";
-
-    // 封裝資料（帶入 LINE 暱稱與 ID）
-    const payload = {
-      userId: currentUser.userId,
-      displayName: currentUser.displayName,
-      item1: parseInt(document.getElementById("qty1").value) || 0,
-      item2: parseInt(document.getElementById("qty2").value) || 0,
-      item3: parseInt(document.getElementById("qty3").value) || 0,
-      item4: parseInt(document.getElementById("qty4").value) || 0,
-      item5: parseInt(document.getElementById("qty5").value) || 0,
-      item6: parseInt(document.getElementById("qty6").value) || 0,
-      item7: parseInt(document.getElementById("qty7").value) || 0,
-      item8: parseInt(document.getElementById("qty8").value) || 0,
-      item9: parseInt(document.getElementById("qty9").value) || 0,
-      item10: parseInt(document.getElementById("qty10").value) || 0,
-      item11: parseInt(document.getElementById("qty11").value) || 0,
-      item12: parseInt(document.getElementById("qty12").value) || 0,
-      item13: parseInt(document.getElementById("qty13").value) || 0,
-      item14: parseInt(document.getElementById("qty14").value) || 0,
-      item15: parseInt(document.getElementById("qty15").value) || 0,
-      item16: parseInt(document.getElementById("qty16").value) || 0,
-      totalAmount: finalTotal
+    const orderData = {
+      userId: lineProfile.userId,
+      displayName: lineProfile.displayName,
+      items: products,
+      totalQty: totalQty,
+      totalAmount: products.reduce((sum, p) => sum + (p.quantity * p.price), 0)
     };
 
-    try {
-      const fetchPromise = fetch(GAS_URL, {
-        method: "POST",
-        body: JSON.stringify(payload)
-      });
-      const delayPromise = new Promise(resolve => setTimeout(resolve, 2000));
+    // 替換為你的 Google Apps Script 部署網址
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbxZflNqYLbreKzYventNg6gEjx7HNY8jlthE0S5rtame8XhnDsv15MFUWeGhK6wtjHGLw/exec";
 
-      const [resp] = await Promise.all([fetchPromise, delayPromise]);
-      const resData = await resp.json();
-      
-      if (resData.status === "success") {
-        btn.innerText = "訂單已傳送！";
-        alert(`訂單建立成功！單號：${resData.orderId}`);
-        liff.closeWindow();
-      } else {
-        alert("提交失敗，請重試：" + (resData.message || ''));
-        btn.disabled = false;
-        btn.innerText = "確認提交訂單";
-      }
-    } catch (err) {
-      alert("傳送發生錯誤，請檢查網路連線或重試");
-      btn.disabled = false;
-      btn.innerText = "確認提交訂單";
-    }
-  });
-
-  main();
+    fetch(GAS_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(orderData)
+    }).then(() => {
+      alert("訂單已成功送出！感謝您的訂購。");
+      // 重置數量
+      products.forEach(p => p.quantity = 0);
+      renderProducts();
+      updateSummary();
+    }).catch(err => {
+      console.error("送出失敗", err);
+      alert("送出失敗，請稍後再試。");
+    });
+  }
 </script>
+
 </body>
 </html>
