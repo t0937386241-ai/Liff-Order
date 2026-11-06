@@ -27,6 +27,31 @@
       color: #2c3e50;
       margin-top: 0;
     }
+    /* LINE 帳號顯示區塊樣式 */
+    .user-profile {
+      display: flex;
+      align-items: center;
+      background: #e8f5e9;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      gap: 10px;
+    }
+    .user-profile img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .user-info-text span {
+      font-size: 13px;
+      color: #666;
+      display: block;
+    }
+    .user-info-text strong {
+      font-size: 15px;
+      color: #2e7d32;
+    }
     /* 公告說明區塊 */
     .notice-box {
       background: #fff3cd;
@@ -49,7 +74,6 @@
       margin: 0 0 4px 0;
       font-size: 16px;
     }
-    /* 品項下方的價格：黑字、不粗體 */
     .product-price {
       margin: 0;
       color: #333;
@@ -95,12 +119,14 @@
       margin-bottom: 8px;
       font-size: 16px;
     }
-    /* 總數量與總金額採用相同的大字體與醒目樣式 */
     .summary-row.total-qty {
       font-size: 18px;
       font-weight: bold;
-      color: #2c3e50;
-    }
+      color: #d9534f;
+      border-top: 1px dashed #ddd;
+      padding-top: 8px;
+      margin-top: 8px;
+    }      
     .summary-row.total-amount {
       font-size: 18px;
       font-weight: bold;
@@ -131,6 +157,15 @@
 <div class="container">
   <h2>專屬訂購單</h2>
 
+  <!-- 💡 LINE 帳號顯示區塊 -->
+  <div id="user-profile-box" class="user-profile">
+    <img id="user-avatar" src="https://via.placeholder.com/40" alt="頭貼">
+    <div class="user-info-text">
+      <span>目前登入帳號</span>
+      <strong id="user-name">正在讀取 LINE 身份...</strong>
+    </div>
+  </div>
+
   <!-- 公告說明區塊 -->
   <div class="notice-box">
     <strong>📢 訂購須知：</strong><br>
@@ -145,11 +180,11 @@
   <div class="checkout-summary">
     <div class="summary-row total-qty">
       <span>總數量：</span>
-      <span><strong id="total-qty">0</strong> 件</span>
+      <span><strong id="total-qty">0</strong> 顆</span>
     </div>
     <div class="summary-row total-amount">
       <span>總金額：</span>
-      <span id="total-amount">$0</span>
+      <span id="total-amount">NT$0 元</span>
     </div>
   </div>
 
@@ -157,7 +192,6 @@
 </div>
 
 <script>
-  // 16 個品項資料
   const products = [
     { id: 1, name: "紅豆", price: 48, quantity: 0 },
     { id: 2, name: "芋泥", price: 48, quantity: 0 },
@@ -194,13 +228,24 @@
           liff.getProfile().then(profile => {
             lineProfile.userId = profile.userId;
             lineProfile.displayName = profile.displayName;
-          }).catch(err => console.error("取得 Profile 失敗", err));
+            
+            // 💡 成功取得後，更新畫面上的名字與頭貼
+            document.getElementById("user-name").innerText = profile.displayName;
+            if (profile.pictureUrl) {
+              document.getElementById("user-avatar").src = profile.pictureUrl;
+            }
+          }).catch(err => {
+            console.error("取得 Profile 失敗", err);
+            document.getElementById("user-name").innerText = "無法取得 LINE 帳號";
+          });
         }
       })
-      .catch(err => console.error("LIFF 初始化失敗", err));
+      .catch(err => {
+        console.error("LIFF 初始化失敗", err);
+        document.getElementById("user-name").innerText = "測試模式 (未在LINE中開啟)";
+      });
   }
 
-  // 渲染商品列表（價格移至品項名稱下方、黑字不粗體）
   function renderProducts() {
     const listContainer = document.getElementById("product-list");
     listContainer.innerHTML = "";
@@ -223,7 +268,6 @@
     });
   }
 
-  // 增減數量
   function changeQty(index, delta) {
     products[index].quantity += delta;
     if (products[index].quantity < 0) {
@@ -233,7 +277,6 @@
     updateSummary();
   }
 
-  // 即時計算總數量與總金額
   function updateSummary() {
     let totalQty = 0;
     let totalAmount = 0;
@@ -247,7 +290,6 @@
     document.getElementById("total-amount").innerText = `$${totalAmount}`;
   }
 
-  // 送出訂單至 Google Apps Script
   function submitOrder() {
     const totalQty = products.reduce((sum, p) => sum + p.quantity, 0);
     if (totalQty === 0) {
@@ -272,7 +314,6 @@
       body: JSON.stringify(orderData)
     }).then(() => {
       alert("訂單已成功送出！感謝您的訂購。");
-      // 重置數量
       products.forEach(p => p.quantity = 0);
       renderProducts();
       updateSummary();
