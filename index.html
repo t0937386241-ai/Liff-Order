@@ -156,7 +156,7 @@
 </div>
 
 <script>
-  // 16 個品項資料（名稱與價格可在此自由修改）
+  // 16 個品項資料
   const products = [
     { id: 1, name: "紅豆", price: 48, quantity: 0 },
     { id: 2, name: "芋泥", price: 48, quantity: 0 },
@@ -181,7 +181,6 @@
   // 初始化網頁與 LIFF
   window.onload = function() {
     renderProducts();
-    // 填入你的 LIFF ID (例如 200xxxxxxx-xxxxxxx)
     initializeLiff("2012419596-l7jcyOIj"); 
   };
 
@@ -265,7 +264,6 @@
       totalAmount: products.reduce((sum, p) => sum + (p.quantity * p.price), 0)
     };
 
-    // 替換為你的 Google Apps Script 部署網址
     const GAS_URL = "https://script.google.com/macros/s/AKfycbxZflNqYLbreKzYventNg6gEjx7HNY8jlthE0S5rtame8XhnDsv15MFUWeGhK6wtjHGLw/exec";
 
     fetch(GAS_URL, {
