@@ -63,6 +63,22 @@
     <div class="total-box">
       總計：<span id="totalAmount">0</span> 元
     </div>
+
+    <!-- 結算資訊區塊 -->
+    <div class="checkout-summary" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+  
+    <!-- 💡 新增：總數量顯示位置 -->
+    <div class="summary-item" style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 16px;">
+     <span>總數量：</span>
+     <span id="total-qty" style="font-weight: bold; color: #333;">0</span> 件
+    </div>
+
+    <!-- 原有的總金額顯示位置 -->
+    <div class="summary-item" style="display: flex; justify-content: space-between; font-size: 18px;">
+     <span>總金額：</span>
+     <span id="total-amount" style="font-weight: bold; color: #d9534f;">$0</span>
+    </div>
+   </div>
     
     <button type="submit" id="submitBtn" disabled>確認提交訂單</button>
   </form>
