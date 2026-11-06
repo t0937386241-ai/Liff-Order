@@ -49,17 +49,12 @@
       margin: 0 0 4px 0;
       font-size: 16px;
     }
+    /* 品項下方的價格：黑字、不粗體 */
     .product-price {
       margin: 0;
-      color: #e74c3c;
-      font-weight: bold;
+      color: #333;
+      font-weight: normal;
       font-size: 14px;
-    }
-    .product-right {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 8px;
     }
     .quantity-control {
       display: flex;
@@ -100,7 +95,13 @@
       margin-bottom: 8px;
       font-size: 16px;
     }
-    .summary-row.total {
+    /* 總數量與總金額採用相同的大字體與醒目樣式 */
+    .summary-row.total-qty {
+      font-size: 18px;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+    .summary-row.total-amount {
       font-size: 18px;
       font-weight: bold;
       color: #d9534f;
@@ -142,11 +143,11 @@
 
   <!-- 結算資訊區塊 -->
   <div class="checkout-summary">
-    <div class="summary-row">
+    <div class="summary-row total-qty">
       <span>總數量：</span>
       <span><strong id="total-qty">0</strong> 件</span>
     </div>
-    <div class="summary-row total">
+    <div class="summary-row total-amount">
       <span>總金額：</span>
       <span id="total-amount">$0</span>
     </div>
@@ -199,7 +200,7 @@
       .catch(err => console.error("LIFF 初始化失敗", err));
   }
 
-  // 渲染商品列表（包含價格與數量控制）
+  // 渲染商品列表（價格移至品項名稱下方、黑字不粗體）
   function renderProducts() {
     const listContainer = document.getElementById("product-list");
     listContainer.innerHTML = "";
@@ -210,14 +211,12 @@
       card.innerHTML = `
         <div class="product-info">
           <h3>${product.name}</h3>
-        </div>
-        <div class="product-right">
           <p class="product-price">$${product.price}</p>
-          <div class="quantity-control">
-            <button onclick="changeQty(${index}, -1)">-</button>
-            <span id="qty-${index}">${product.quantity}</span>
-            <button onclick="changeQty(${index}, 1)">+</button>
-          </div>
+        </div>
+        <div class="quantity-control">
+          <button onclick="changeQty(${index}, -1)">-</button>
+          <span id="qty-${index}">${product.quantity}</span>
+          <button onclick="changeQty(${index}, 1)">+</button>
         </div>
       `;
       listContainer.appendChild(card);
